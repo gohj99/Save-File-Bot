@@ -65,12 +65,10 @@ def progress(current, total, message, type):
 # 开始命令处理函数
 @bot.on_message(filters.command(["start"]))
 def send_start(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
-	#bot.send_message(message.chat.id, f"__👋 Hi **{message.from_user.mention}**, I am Save File Bot\n你可以发送文件或受限内容的链接让我保存__\n\n{USAGE}",
-	#reply_markup=InlineKeyboardMarkup([[ InlineKeyboardButton("🌐 Source Code", url="https://github.com/bipinkrish/Save-Restricted-Bot")]]), reply_to_message_id=message.id)
-		bot.send_message(message.chat.id, f"__👋 Hi **{message.from_user.mention}**, I am Save File Bot\n你可以发送文件或受限内容的链接让我保存__\n\n{USAGE}", reply_to_message_id=message.id)
+	bot.send_message(message.chat.id, f"__👋 Hi **{message.from_user.mention}**, I am Save File Bot\n你可以发送文件或受限内容的链接让我保存__\n\n{USAGE}",
+	reply_markup=InlineKeyboardMarkup([[ InlineKeyboardButton("🌐 源码仓库", url="https://github.com/gohj99/Save-File-Bot")]]), reply_to_message_id=message.id)
 
 #收到视频或图片执行
-
 @bot.on_message(filters.photo | filters.video)
 def save_media(client, message):
     if message.photo:
@@ -188,49 +186,7 @@ def handle_private(message: pyrogram.types.messages_and_media.message.Message, c
 		os.remove(f'{message.id}downstatus.txt')
 		bot.delete_messages(message.chat.id,[smsg.id])
 		smsg = bot.send_message(message.chat.id, '__保存成功__', reply_to_message_id=message.id)
-
-		#upsta = threading.Thread(target=lambda:upstatus(f'{message.id}upstatus.txt',smsg),daemon=True)
-		#upsta.start()
-		
-		#if "Document" == msg_type:
-		#	try:
-		#		thumb = acc.download_media(msg.document.thumbs[0].file_id)
-		#	except: thumb = None
-			
-		#	bot.send_document(message.chat.id, file, thumb=thumb, caption=msg.caption, caption_entities=msg.caption_entities, reply_to_message_id=message.id, progress=progress, progress_args=[message,"up"])
-		#	if thumb != None: os.remove(thumb)
-
-		#elif "Video" == msg_type:
-		#	try: 
-		#		thumb = acc.download_media(msg.video.thumbs[0].file_id)
-		#	except: thumb = None
-
-		#	bot.send_video(message.chat.id, file, duration=msg.video.duration, width=msg.video.width, height=msg.video.height, thumb=thumb, caption=msg.caption, caption_entities=msg.caption_entities, reply_to_message_id=message.id, progress=progress, progress_args=[message,"up"])
-		#	if thumb != None: os.remove(thumb)
-
-		#elif "Animation" == msg_type:
-		#	bot.send_animation(message.chat.id, file, reply_to_message_id=message.id)
-			   
-		#elif "Sticker" == msg_type:
-		#	bot.send_sticker(message.chat.id, file, reply_to_message_id=message.id)
-
-		#elif "Voice" == msg_type:
-		#	bot.send_voice(message.chat.id, file, caption=msg.caption, thumb=thumb, caption_entities=msg.caption_entities, reply_to_message_id=message.id, progress=progress, progress_args=[message,"up"])
-
-		#elif "Audio" == msg_type:
-		#	try:
-		#		thumb = acc.download_media(msg.audio.thumbs[0].file_id)
-		#	except: thumb = None
-				
-		#	bot.send_audio(message.chat.id, file, caption=msg.caption, caption_entities=msg.caption_entities, reply_to_message_id=message.id, progress=progress, progress_args=[message,"up"])   
-		#	if thumb != None: os.remove(thumb)
-
-		#elif "Photo" == msg_type:
-		#	bot.send_photo(message.chat.id, file, caption=msg.caption, caption_entities=msg.caption_entities, reply_to_message_id=message.id)
-
-		#os.remove(file)
-		#if os.path.exists(f'{message.id}upstatus.txt'): os.remove(f'{message.id}upstatus.txt')
-		#bot.delete_messages(message.chat.id,[smsg.id])
+		return file
 
 # 保存发来的图片或视频
 def handle_save(message: pyrogram.types.messages_and_media.message.Message):
@@ -248,49 +204,6 @@ def handle_save(message: pyrogram.types.messages_and_media.message.Message):
 		bot.delete_messages(message.chat.id,[smsg.id])
 		smsg = bot.send_message(message.chat.id, '__保存成功__', reply_to_message_id=message.id)
 		return file
-
-		#upsta = threading.Thread(target=lambda:upstatus(f'{message.id}upstatus.txt',smsg),daemon=True)
-		#upsta.start()
-		
-		#if "Document" == msg_type:
-		#	try:
-		#		thumb = acc.download_media(msg.document.thumbs[0].file_id)
-		#	except: thumb = None
-			
-		#	bot.send_document(message.chat.id, file, thumb=thumb, caption=msg.caption, caption_entities=msg.caption_entities, reply_to_message_id=message.id, progress=progress, progress_args=[message,"up"])
-		#	if thumb != None: os.remove(thumb)
-
-		#elif "Video" == msg_type:
-		#	try: 
-		#		thumb = acc.download_media(msg.video.thumbs[0].file_id)
-		#	except: thumb = None
-
-		#	bot.send_video(message.chat.id, file, duration=msg.video.duration, width=msg.video.width, height=msg.video.height, thumb=thumb, caption=msg.caption, caption_entities=msg.caption_entities, reply_to_message_id=message.id, progress=progress, progress_args=[message,"up"])
-		#	if thumb != None: os.remove(thumb)
-
-		#elif "Animation" == msg_type:
-		#	bot.send_animation(message.chat.id, file, reply_to_message_id=message.id)
-			   
-		#elif "Sticker" == msg_type:
-		#	bot.send_sticker(message.chat.id, file, reply_to_message_id=message.id)
-
-		#elif "Voice" == msg_type:
-		#	bot.send_voice(message.chat.id, file, caption=msg.caption, thumb=thumb, caption_entities=msg.caption_entities, reply_to_message_id=message.id, progress=progress, progress_args=[message,"up"])
-
-		#elif "Audio" == msg_type:
-		#	try:
-		#		thumb = acc.download_media(msg.audio.thumbs[0].file_id)
-		#	except: thumb = None
-				
-		#	bot.send_audio(message.chat.id, file, caption=msg.caption, caption_entities=msg.caption_entities, reply_to_message_id=message.id, progress=progress, progress_args=[message,"up"])   
-		#	if thumb != None: os.remove(thumb)
-
-		#elif "Photo" == msg_type:
-		#	bot.send_photo(message.chat.id, file, caption=msg.caption, caption_entities=msg.caption_entities, reply_to_message_id=message.id)
-
-		#os.remove(file)
-		#if os.path.exists(f'{message.id}upstatus.txt'): os.remove(f'{message.id}upstatus.txt')
-		#bot.delete_messages(message.chat.id,[smsg.id])
 
 # 获取消息类型
 def get_message_type(msg: pyrogram.types.messages_and_media.message.Message):
@@ -366,5 +279,5 @@ __最好在中间加上空格__
 """
 
 
-# infinty polling
+# 启动机器人（进入无限轮询）
 bot.run()
