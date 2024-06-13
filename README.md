@@ -4,7 +4,7 @@
 
 ---
 
-## 变量
+## 配置
 
 - `HASH` 来自 my.telegram.org 的 API HASH
 - `ID` 来自 my.telegram.org 的 API ID
