@@ -43,3 +43,9 @@ https://t.me/c/xxxx/101 - 120
 ```
 
 __最好在中间加上空格__
+
+---
+
+## 引用项目
+
+- [Save-Restricted-Bot](https://github.com/bipinkrish/Save-Restricted-Bot)
