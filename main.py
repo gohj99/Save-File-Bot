@@ -69,24 +69,20 @@ def send_start(client: pyrogram.client.Client, message: pyrogram.types.messages_
 	reply_markup=InlineKeyboardMarkup([[ InlineKeyboardButton("🌐 源码仓库", url="https://github.com/gohj99/Save-File-Bot")]]), reply_to_message_id=message.id)
 
 #收到视频或图片执行
-@bot.on_message(filters.photo | filters.video)
+@bot.on_message(filters.photo | filters.video | filters.document)
 def save_media(client, message):
     if message.photo:
         # 处理收到的图片消息
         print("收到图片")
-        # 下载图片
-        #file_path = client.download_media(message)
-        file_path = handle_save(message)
-        print(f"图片已下载到: {file_path}")
-        #message.reply_text("图片已收到并下载！")
     elif message.video:
         # 处理收到的视频消息
         print("收到视频")
         # 下载视频
-        #file_path = client.download_media(message)
-        file_path = handle_save(message)
-        print(f"视频已下载到: {file_path}")
-        #message.reply_text("视频已收到并下载！")
+    elif message.document:
+        # 处理收到的文件消息
+        print("收到文件")
+    file_path = handle_save(message)
+    print(f"文件已下载到: {file_path}")
 
 #收到“https://t.me/***”后执行
 @bot.on_message(filters.text)
@@ -97,19 +93,19 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 	if "https://t.me/+" in message.text or "https://t.me/joinchat/" in message.text:
 
 		if acc is None:
-			bot.send_message(message.chat.id,f"**String Session is not Set**", reply_to_message_id=message.id)
+			bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
 			return
 
 		try:
 			try: acc.join_chat(message.text)
 			except Exception as e: 
-				bot.send_message(message.chat.id,f"**Error** : __{e}__", reply_to_message_id=message.id)
+				bot.send_message(message.chat.id,f"**加入失败** : __{e}__", reply_to_message_id=message.id)
 				return
-			bot.send_message(message.chat.id,"**Chat Joined**", reply_to_message_id=message.id)
+			bot.send_message(message.chat.id,"**加入成功**", reply_to_message_id=message.id)
 		except UserAlreadyParticipant:
-			bot.send_message(message.chat.id,"**Chat alredy Joined**", reply_to_message_id=message.id)
+			bot.send_message(message.chat.id,"**你已经加入过了**", reply_to_message_id=message.id)
 		except InviteHashExpired:
-			bot.send_message(message.chat.id,"**Invalid Link**", reply_to_message_id=message.id)
+			bot.send_message(message.chat.id,"**加入链接错误**", reply_to_message_id=message.id)
 
 	# 收到消息
 	elif "https://t.me/" in message.text:
@@ -127,7 +123,7 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 				chatid = int("-100" + datas[4])
 				
 				if acc is None:
-					bot.send_message(message.chat.id,f"**String Session is not Set**", reply_to_message_id=message.id)
+					bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
 					return
 				
 				handle_private(message,chatid,msgid)
@@ -139,10 +135,10 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 				username = datas[4]
 				
 				if acc is None:
-					bot.send_message(message.chat.id,f"**String Session is not Set**", reply_to_message_id=message.id)
+					bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
 					return
 				try: handle_private(message,username,msgid)
-				except Exception as e: bot.send_message(message.chat.id,f"**Error** : __{e}__", reply_to_message_id=message.id)
+				except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
 
 			# 公开的聊天
 			else:
@@ -150,7 +146,7 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 
 				try: msg  = bot.get_messages(username,msgid)
 				except UsernameNotOccupied: 
-					bot.send_message(message.chat.id,f"**The username is not occupied by anyone**", reply_to_message_id=message.id)
+					bot.send_message(message.chat.id,f"**不存在这个用户名**", reply_to_message_id=message.id)
 					return
 				try:
 					if '?single' not in message.text:
@@ -161,10 +157,10 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 						handle_private(message,username,msgid)
 				except:
 					if acc is None:
-						bot.send_message(message.chat.id,f"**String Session is not Set**", reply_to_message_id=message.id)
+						bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
 						return
 					try: handle_private(message,username,msgid)
-					except Exception as e: bot.send_message(message.chat.id,f"**Error** : __{e}__", reply_to_message_id=message.id)
+					except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
 
 			# 等待时间
 			time.sleep(3)
@@ -186,6 +182,7 @@ def handle_private(message: pyrogram.types.messages_and_media.message.Message, c
 		os.remove(f'{message.id}downstatus.txt')
 		bot.delete_messages(message.chat.id,[smsg.id])
 		smsg = bot.send_message(message.chat.id, '__保存成功__', reply_to_message_id=message.id)
+		print(f"文件已下载到: {file}")
 		return file
 
 # 保存发来的图片或视频
