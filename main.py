@@ -107,60 +107,58 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 		except InviteHashExpired:
 			bot.send_message(message.chat.id,"**加入链接错误**", reply_to_message_id=message.id)
 
-	# 收到消息
+        # 收到消息
 	elif "https://t.me/" in message.text:
-
-		datas = message.text.split("/")
-		temp = datas[-1].replace("?single","").split("-")
-		fromID = int(temp[0].strip())
-		try: toID = int(temp[1].strip())
-		except: toID = fromID
-
-		for msgid in range(fromID, toID+1):
-
-			# 私人的聊天
-			if "https://t.me/c/" in message.text:
-				chatid = int("-100" + datas[4])
-				
-				if acc is None:
-					bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
-					return
-				
-				handle_private(message,chatid,msgid)
-				# try: handle_private(message,chatid,msgid)
-				# except Exception as e: bot.send_message(message.chat.id,f"**Error** : __{e}__", reply_to_message_id=message.id)
-			
-			# 机器人的聊天
-			elif "https://t.me/b/" in message.text:
-				username = datas[4]
-				
-				if acc is None:
-					bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
-					return
-				try: handle_private(message,username,msgid)
-				except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
-
-			# 公开的聊天
-			else:
-				username = datas[3]
-
-				try: msg  = bot.get_messages(username,msgid)
-				except UsernameNotOccupied: 
-					bot.send_message(message.chat.id,f"**不存在这个用户名**", reply_to_message_id=message.id)
-					return
-				try:
-					if '?single' not in message.text:
-						#bot.copy_message(message.chat.id, msg.chat.id, msg.id, reply_to_message_id=message.id)
-						handle_private(message,username,msgid)
-					else:
-						#bot.copy_media_group(message.chat.id, msg.chat.id, msg.id, reply_to_message_id=message.id)
-						handle_private(message,username,msgid)
-				except:
+		urls = message.text.strip().split('\n')
+		for url in urls:
+			datas = url.split("/")
+			temp = datas[-1].replace("?single","").split("-")
+			fromID = int(temp[0].strip())
+			# 如果链接后面跟有范围（如"-xxx"），则提取toID，否则toID等于fromID
+			try:
+				toID = int(temp[1].strip())
+			except IndexError:  # 如果没有提供toID的情况
+				toID = fromID
+        	# 针对每个链接，执行从fromID到toID的循环
+			for msgid in range(fromID, toID + 1):
+				print('已经执行')
+                # 私人的聊天
+				if "https://t.me/c/" in message.text:
+					chatid = int("-100" + datas[4])
+					
 					if acc is None:
-						bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
-						return
+							bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
+							return
+
+					handle_private(message,chatid,msgid)
+					# try: handle_private(message,chatid,msgid)
+					# except Exception as e: bot.send_message(message.chat.id,f"**Error** : __{e}__", reply_to_message_id=message.id)
+
+				# 机器人的聊天
+				elif "https://t.me/b/" in message.text:
+					username = datas[4]
+					if acc is None:
+							bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
+							return
 					try: handle_private(message,username,msgid)
 					except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
+
+				# 公开的聊天
+				else:
+					username = datas[3]
+
+					try: msg  = bot.get_messages(username,msgid)
+					except UsernameNotOccupied: 
+							bot.send_message(message.chat.id,f"**不存在这个用户名**", reply_to_message_id=message.id)
+							return
+					try:
+							handle_private(message,username,msgid)
+					except:
+							if acc is None:
+									bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
+									return
+							try: handle_private(message,username,msgid)
+							except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
 
 			# 等待时间
 			time.sleep(3)
