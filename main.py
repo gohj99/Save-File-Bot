@@ -111,6 +111,7 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 	elif "https://t.me/" in message.text:
 		urls = message.text.strip().split('\n')
 		for url in urls:
+			if url == '':continue
 			datas = url.split("/")
 			temp = datas[-1].replace("?single","").split("-")
 			fromID = int(temp[0].strip())
@@ -119,10 +120,10 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 				toID = int(temp[1].strip())
 			except IndexError:  # 如果没有提供toID的情况
 				toID = fromID
-        	# 针对每个链接，执行从fromID到toID的循环
+			# 针对每个链接，执行从fromID到toID的循环
 			for msgid in range(fromID, toID + 1):
-				print('已经执行')
-                # 私人的聊天
+				#print('已经执行')
+				# 私人的聊天
 				if "https://t.me/c/" in message.text:
 					chatid = int("-100" + datas[4])
 					
