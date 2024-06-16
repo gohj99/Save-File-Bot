@@ -66,9 +66,9 @@ def progress(current, total, message, type):
 @bot.on_message(filters.command(["start"]))
 def send_start(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
 	if client.get_users(message.from_user.id).id == acc.get_me().id:
-		print('主人账号')
-	bot.send_message(message.chat.id, f"__👋 Hi **{message.from_user.mention}**, I am Save File Bot\n你可以发送文件或受限内容的链接让我保存__\n\n{USAGE}",
-	reply_markup=InlineKeyboardMarkup([[ InlineKeyboardButton("🌐 源码仓库", url="https://github.com/gohj99/Save-File-Bot")]]), reply_to_message_id=message.id)
+		#print('主人账号')
+		bot.send_message(message.chat.id, f"__👋 Hi **{message.from_user.mention}**, I am Save File Bot\n你可以发送文件或受限内容的链接让我保存__\n\n{USAGE}",
+		reply_markup=InlineKeyboardMarkup([[ InlineKeyboardButton("🌐 源码仓库", url="https://github.com/gohj99/Save-File-Bot")]]), reply_to_message_id=message.id)
 
 #收到视频或图片执行
 @bot.on_message(filters.photo | filters.video | filters.document)
@@ -90,16 +90,14 @@ def save_media(client, message):
 #收到“https://t.me/***”后执行
 @bot.on_message(filters.text)
 def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
+	if acc is None:
+		bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
+		return
 	if client.get_users(message.from_user.id).id != acc.get_me().id:return
 	print(message.text)
 
 	# 加入聊天
 	if "https://t.me/+" in message.text or "https://t.me/joinchat/" in message.text:
-
-		if acc is None:
-			bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
-			return
-
 		try:
 			try: acc.join_chat(message.text)
 			except Exception as e: 
@@ -130,11 +128,6 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 				# 私人的聊天
 				if "https://t.me/c/" in message.text:
 					chatid = int("-100" + datas[4])
-					
-					if acc is None:
-							bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
-							return
-
 					handle_private(message,chatid,msgid)
 					# try: handle_private(message,chatid,msgid)
 					# except Exception as e: bot.send_message(message.chat.id,f"**Error** : __{e}__", reply_to_message_id=message.id)
@@ -142,9 +135,6 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 				# 机器人的聊天
 				elif "https://t.me/b/" in message.text:
 					username = datas[4]
-					if acc is None:
-							bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
-							return
 					try: handle_private(message,username,msgid)
 					except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
 
@@ -159,9 +149,6 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 					try:
 							handle_private(message,username,msgid)
 					except:
-							if acc is None:
-									bot.send_message(message.chat.id,f"**请先设置STRING**", reply_to_message_id=message.id)
-									return
 							try: handle_private(message,username,msgid)
 							except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
 
