@@ -65,12 +65,15 @@ def progress(current, total, message, type):
 # 开始命令处理函数
 @bot.on_message(filters.command(["start"]))
 def send_start(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
+	if client.get_users(message.from_user.id).id == acc.get_me().id:
+		print('主人账号')
 	bot.send_message(message.chat.id, f"__👋 Hi **{message.from_user.mention}**, I am Save File Bot\n你可以发送文件或受限内容的链接让我保存__\n\n{USAGE}",
 	reply_markup=InlineKeyboardMarkup([[ InlineKeyboardButton("🌐 源码仓库", url="https://github.com/gohj99/Save-File-Bot")]]), reply_to_message_id=message.id)
 
 #收到视频或图片执行
 @bot.on_message(filters.photo | filters.video | filters.document)
 def save_media(client, message):
+    if client.get_users(message.from_user.id).id != acc.get_me().id:return
     if message.photo:
         # 处理收到的图片消息
         print("收到图片")
@@ -87,6 +90,7 @@ def save_media(client, message):
 #收到“https://t.me/***”后执行
 @bot.on_message(filters.text)
 def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_media.message.Message):
+	if client.get_users(message.from_user.id).id != acc.get_me().id:return
 	print(message.text)
 
 	# 加入聊天
@@ -122,7 +126,7 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 				toID = fromID
 			# 针对每个链接，执行从fromID到toID的循环
 			for msgid in range(fromID, toID + 1):
-				#print('已经执行')
+				if len(datas) < 4:continue
 				# 私人的聊天
 				if "https://t.me/c/" in message.text:
 					chatid = int("-100" + datas[4])
@@ -163,6 +167,7 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
 
 			# 等待时间
 			time.sleep(3)
+	else:return
 
 
 # 处理私人的聊天
