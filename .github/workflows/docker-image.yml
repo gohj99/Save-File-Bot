@@ -1,18 +1,20 @@
 name: Save-File-Bot
-
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-
+    branches: ["main"]
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Save Docker image as tar file
+      run: docker save -o Save-File-Bot-Image.tar my-image-name:$(date +%s)
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: docker-image
+        path: Save-File-Bot-Image.tar
