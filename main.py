@@ -126,69 +126,71 @@ def save(client: pyrogram.client.Client, message: pyrogram.types.messages_and_me
                 toID = fromID
             # 针对每个链接，执行从fromID到toID的循环
             for msgid in range(fromID, toID + 1):
-                if len(datas) < 4:continue
-                # 私人的聊天
-                if "https://t.me/c/" in message.text:
-                    chatid = int("-100" + datas[4])
-                    handle_private(message,chatid,msgid)
-                    # try: handle_private(message,chatid,msgid)
-                    # except Exception as e: bot.send_message(message.chat.id,f"**Error** : __{e}__", reply_to_message_id=message.id)
+                try:
+                    if len(datas) < 4:continue
+                    # 私人的聊天
+                    if "https://t.me/c/" in url:
+                        chatid = int("-100" + datas[4])
+                        handle_private(message,chatid,msgid)
+                        # try: handle_private(message,chatid,msgid)
+                        # except Exception as e: bot.send_message(message.chat.id,f"**Error** : __{e}__", reply_to_message_id=message.id)
 
-                # 机器人的聊天
-                elif "https://t.me/b/" in message.text:
-                    username = datas[4]
-                    try: handle_private(message,username,msgid)
-                    except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
+                    # 机器人的聊天
+                    elif "https://t.me/b/" in url:
+                        username = datas[4]
+                        try: handle_private(message,username,msgid)
+                        except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
 
-                # 公开的聊天
-                else:
-                    username = datas[3]
+                    # 公开的聊天
+                    else:
+                        username = datas[3]
 
-                    try: msg  = bot.get_messages(username,msgid)
-                    except UsernameNotOccupied: 
-                        bot.send_message(message.chat.id,f"**不存在这个用户名**", reply_to_message_id=message.id)
-                        continue
-                    try: handle_private(message,username,msgid)
-                    except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
+                        try: msg  = bot.get_messages(username,msgid)
+                        except UsernameNotOccupied: 
+                            bot.send_message(message.chat.id,f"**不存在这个用户名**", reply_to_message_id=message.id)
+                            continue
+                        try: handle_private(message,username,msgid)
+                        except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
+                except Exception as e: bot.send_message(message.chat.id,f"**错误** : __{e}__", reply_to_message_id=message.id)
             # 等待时间
             time.sleep(0.5)
     else:return
 
 # 处理私人的聊天
 def handle_private(message: pyrogram.types.messages_and_media.message.Message, chatid: int, msgid: int):
-        msg: pyrogram.types.messages_and_media.message.Message = acc.get_messages(chatid,msgid)
-        msg_type = get_message_type(msg)
+    msg: pyrogram.types.messages_and_media.message.Message = acc.get_messages(chatid,msgid)
+    msg_type = get_message_type(msg)
 
-        if "Text" == msg_type:
-            bot.send_message(message.chat.id, msg.text, entities=msg.entities, reply_to_message_id=message.id)
-            return
+    if "Text" == msg_type:
+        bot.send_message(message.chat.id, msg.text, entities=msg.entities, reply_to_message_id=message.id)
+        return
 
-        smsg = bot.send_message(message.chat.id, '__下载中__', reply_to_message_id=message.id)
-        dosta = threading.Thread(target=lambda:downstatus(f'{message.id}downstatus.txt',smsg),daemon=True)
-        dosta.start()
-        file = acc.download_media(msg, progress=progress, progress_args=[message,"down"])
-        os.remove(f'{message.id}downstatus.txt')
-        bot.delete_messages(message.chat.id,[smsg.id])
-        smsg = bot.send_message(message.chat.id, '__保存成功__', reply_to_message_id=message.id)
-        print(f"文件已下载到: {file}")
-        return file
+    smsg = bot.send_message(message.chat.id, '__下载中__', reply_to_message_id=message.id)
+    dosta = threading.Thread(target=lambda:downstatus(f'{message.id}downstatus.txt',smsg),daemon=True)
+    dosta.start()
+    file = acc.download_media(msg, progress=progress, progress_args=[message,"down"])
+    os.remove(f'{message.id}downstatus.txt')
+    bot.delete_messages(message.chat.id,[smsg.id])
+    smsg = bot.send_message(message.chat.id, '__保存成功__', reply_to_message_id=message.id)
+    print(f"文件已下载到: {file}")
+    return file
 
 # 保存发来的图片或视频
 def handle_save(message: pyrogram.types.messages_and_media.message.Message):
-        message_type = get_message_type(message)
+    message_type = get_message_type(message)
 
-        if "Text" == message_type:
-            bot.send_message(message.chat.id, message.text, entities=message.entities, reply_to_message_id=message.id)
-            return
+    if "Text" == message_type:
+        bot.send_message(message.chat.id, message.text, entities=message.entities, reply_to_message_id=message.id)
+        return
 
-        smsg = bot.send_message(message.chat.id, '__下载中__', reply_to_message_id=message.id)
-        dosta = threading.Thread(target=lambda:downstatus(f'{message.id}downstatus.txt',smsg),daemon=True)
-        dosta.start()
-        file = bot.download_media(message, progress=progress, progress_args=[message,"down"])
-        os.remove(f'{message.id}downstatus.txt')
-        bot.delete_messages(message.chat.id,[smsg.id])
-        smsg = bot.send_message(message.chat.id, '__保存成功__', reply_to_message_id=message.id)
-        return file
+    smsg = bot.send_message(message.chat.id, '__下载中__', reply_to_message_id=message.id)
+    dosta = threading.Thread(target=lambda:downstatus(f'{message.id}downstatus.txt',smsg),daemon=True)
+    dosta.start()
+    file = bot.download_media(message, progress=progress, progress_args=[message,"down"])
+    os.remove(f'{message.id}downstatus.txt')
+    bot.delete_messages(message.chat.id,[smsg.id])
+    smsg = bot.send_message(message.chat.id, '__保存成功__', reply_to_message_id=message.id)
+    return file
 
 # 获取消息类型
 def get_message_type(msg: pyrogram.types.messages_and_media.message.Message):
