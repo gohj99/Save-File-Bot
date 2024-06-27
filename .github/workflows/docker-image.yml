@@ -2,17 +2,18 @@ name: Save-File-Bot
 on:
   push:
     branches: ["main"]
-  pull_request:
-    branches: ["main"]
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Get the date
+      id: date
+      run: echo "::set-output name=date::$(date +%s)"
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: docker build . --file Dockerfile --tag my-image-name:${{ steps.date.outputs.date }}
     - name: Save Docker image as tar file
-      run: docker save -o Save-File-Bot-Image.tar my-image-name:$(date +%s)
+      run: docker save -o Save-File-Bot-Image.tar my-image-name:${{ steps.date.outputs.date }}
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
